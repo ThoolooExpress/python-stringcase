@@ -4,6 +4,18 @@ String convert functions
 
 import re
 
+def tokenize(in_str):
+    # Handle duplicate delimiters
+    spaceSeparated = re.sub(r'\s|-|_{2,}', ' ', in_str)
+    # Split on lowercase -> UPPERCASE
+    spaceSeparated = re.sub(r'([a-z])([A-Z])', r'\1 \2', spaceSeparated)
+    # Split on '-' and '_'
+    spaceSeparated = re.sub(r'-|_', ' ', spaceSeparated)
+    # Split on digit to letter
+    spaceSeparated = re.sub(r'(\d)([A-Za-z])', r'\1 \2', spaceSeparated)
+    # Split on letter to digit
+    spaceSeparated = re.sub(r'([A-Za-z])(\d)', r'\1 \2', spaceSeparated)
+    return spaceSeparated.split(' ')
 
 def camelcase(string):
     """ Convert string into camel case.
@@ -15,12 +27,14 @@ def camelcase(string):
         string: Camel case string.
 
     """
-
-    string = re.sub(r"^[\-_\.]", '', str(string))
-    if not string:
-        return string
-    return lowercase(string[0]) + re.sub(r"[\-_\.\s]([a-z])", lambda matched: uppercase(matched.group(1)), string[1:])
-
+    tokens = tokenize(string)
+    camelCase = ''
+    for idx, tok in enumerate(tokens):
+        tok = tok.lower()
+        if idx != 0:
+            tok = tok[0].upper() + tok[1:]
+        camelCase = camelCase + tok
+    return camelCase
 
 def capitalcase(string):
     """Convert string into capital case.
